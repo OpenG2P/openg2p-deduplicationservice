@@ -1,0 +1,54 @@
+version: '3'
+services:
+  elasticsearch:
+    image: openg2p/elasticsearch
+    container_name: openg2p-elasticsearch
+    expose:
+      - 9200
+      - 9300
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks
+      # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - openg2p-network
+    tty: true
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.1
+    container_name: openg2p-kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - openg2p-network
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_HOSTS: http://openg2p-elasticsearch:9200
+
+  searchservice:
+    image: openg2p/searchservice
+    container_name: openg2p-searchservice
+    entrypoint: ["./wait-for-it.sh", "openg2p-elasticsearch:9200", "--", "./run.sh"]
+    ports:
+      - 9080:8080
+    networks:
+      - openg2p-network
+    depends_on:
+      - elasticsearch
+      - kibana
+    environment:
+      SEARCHSERVICE_ELASTIC_ENDPOINT: http://openg2p-elasticsearch:9200
+    tty: true
+
+networks:
+  openg2p-network:
+    external: true
+
+volumes:
+  es_data:
