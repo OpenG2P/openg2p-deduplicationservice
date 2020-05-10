@@ -21,8 +21,9 @@ but provides an easily extensible framework for adopters to add more methods, e.
 
 ## Getting Started
 
-# ⚠️ Do not use as your data store!
-# ⚠️ Do not expose to the internet or untrusted networks in production
+> **_WARNING:_**  
+>Do not use as your data store!
+>Do not expose to the internet or untrusted networks in production!
 
 ### Using  Docker Compose
 You can get started by using the docker compose which starts both the server and its dependencies
@@ -45,7 +46,8 @@ Set `searchservice.elastic.endpoint` to your elasticsearch endpoint e.g. `http:/
 ./gradlew bootRun
 ```
 
-# ⚠️ Will not start if it cannot connect to elasticsearch!
+> **_NOTE:_**  
+> Will not start if it cannot connect to elasticsearch!
 
 ## User Guide
 Provides a Rest API for persons/beneficiaries data to be indexed and queried. A typical use case will
