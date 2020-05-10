@@ -1,20 +1,18 @@
 # OpenG2P Search Service
 
-“OpenG2P” is a set of digital building blocks opensourced to support large scale cash
+The “OpenG2P” is a set of digital building blocks opensourced to support large scale cash
 transfer programs digitize key cogs in their delivery chain: 1) beneficiary targeting
 and enrollment, 2) beneficiary list management, 3) payment digitization, and 4)
 recourse.
 
-This project provides an extensible entity resolution framework for finding/matching beneficiaries usually lacking
-unique identities helping programs deduplicate their beneficiary lists.
+This project provides an extensible entity resolution framework for finding/matching persons usually lacking
+unique identities, helping programs main the uniqueness of and deduplicate their beneficiary lists.
 
-Can be used as standalone but also integrates with the [OpenG2P CRM](https://github.com/openg2p/crm)
+Can be used as a standalone component and also integrates with the [OpenG2P CRM](https://github.com/openg2p/crm)
 
 ## Background
-Government-to-persons programs need to be confidence of the uniqueness of beneficiaries they serve and avoid double-dipping; 
-e.g. a payment program should not pay the same individual multiple times per period. However, this is major challenge
-in countries where universal unique ID coverage (e.g. national ID) is low. The OpenG2P Search Service helps alleviate this 
-by using other attributes to compare beneficiaries while accounting fot typos and numerous ways a single information, e.g street address, can be represented
+Government-to-persons programs must be confident of the uniqueness of beneficiaries they serve and avoid double-dipping. A social protection transfer program, as an example, should not be paying the same individual multiple times per period. Yet, this is a significant challenge
+in countries where universal unique ID coverage, e.g., national ID, is low. The OpenG2P Search Service helps alleviate this and improve confidence in these disbursement lists by using combinations of beneficiary's attributes (e.g., name, address, dob) to find high probabilities of duplicates. The strategy employed is called entity resolution and also accounts for typos and representation nuisances in these attributes, e.g., names, addresses, etc
 
 By default, it leverages [elasticsearch](https://www.elastic.co) and [zentity](https://zentity.io/) for entity resolution 
 but provides an easily extensible framework for adopters to add more methods, e.g. facial recognition. 
@@ -22,11 +20,11 @@ but provides an easily extensible framework for adopters to add more methods, e.
 ## Getting Started
 
 > **_WARNING:_**  
->Do not use as your data store!
+>Do not use it as your data store!
 >Do not expose to the internet or untrusted networks in production!
 
 ### Using  Docker Compose
-You can get started by using the docker compose which starts both the server and its dependencies
+You can get started by using the docker-compose which starts both the server and its dependencies.
 
 ```shell script
 docker-compose up -d
@@ -34,11 +32,17 @@ docker-compose up -d
 
 ### Manually
 
-You will need to run its dependencies:
-- [elasticsearch 7.6.1](https://www.elastic.co/downloads/past-releases/elasticsearch-7-6-1)
+You will need to have  [elasticsearch 7.6.1](https://www.elastic.co/downloads/past-releases/elasticsearch-7-6-1) up and running
+with the following plugins installed:
 - [zentity 1.6.0](https://zentity.io/releases/zentity-1.6.0-elasticsearch-7.6.1.zip)
 - analysis-phonetic
 - analysis-icu
+
+```shell script
+elasticsearch-plugin install https://zentity.io/releases/zentity-1.6.0-elasticsearch-7.6.1.zip
+elasticsearch-plugin install analysis-phonetic
+elasticsearch-plugin install analysis-icu
+```
 
 Set `searchservice.elastic.endpoint` to your elasticsearch endpoint e.g. `http://localhost:9200`
 
@@ -53,12 +57,12 @@ Set `searchservice.elastic.endpoint` to your elasticsearch endpoint e.g. `http:/
 Provides a Rest API for persons/beneficiaries data to be indexed and queried. A typical use case will
 1) index all enrolled beneficiaries into the search service
 2) query the search service to assert that beneficiary not already enrolled before proceed
-3) use for de-duplicating existing enrollments 
+3) use for existing deduplicating enrollments 
 
 ### API
 
 #### Indexing Beneficiary
-Adding a beneficiary to the search service, e.g. beneficiary add to your program
+Adding a beneficiary to the search service, e.g., beneficiary add to your program
 
 ```shell script
 POST /index
@@ -116,7 +120,7 @@ matched the query. Querying with as much data as possible increases the likeliho
 
 #### De-indexing Beneficiary 
 
-Removing a beneficiary from the search service, e.g. beneficiary removed from your program
+Removing a beneficiary from the search service, e.g., beneficiary removed from your program
 
 ```shell script
 DELETE /index/{id}
@@ -147,24 +151,22 @@ Table shows a list of beneficiary attributes allowed for indexing and querying:
 | emergency_contact_name  | String | Name of person listed as emergency contact                           |
 | emergency_contact_phone | String | Phone of person listed as emergency contact; without country code    |
 
-You do not need to provide all this data when indexing or querying for records, however the more attributes you can 
-provide, the better the precision of your result; i.e. try to provide all for both index and query operations!
+You do not need to provide all this data when indexing or querying for records; however the more attributes you can 
+supply, the better the precision of your result; i.e. try to supply all these fields for both index and query operations!
 
 ### Kibana UI
 
-We docker compose ships with Kibana, providing the power to run visualize your beneficiary data in custom ways and 
-run queries against the elasticsearch beackend. 
+The  docker-compose ships with Kibana, providing the power to visualize your beneficiary data in custom ways and 
+run queries against the elasticsearch backend. 
 
 **Navigate to `http://<you-ip-address>:5601`**
 
 ![](doc/images/kibana_query_ui.png)
 
-We appreciate if you can contribute these visualizations to the project.
+We appreciate the contributions of these visualizations.
 
 ## How it works
-The default implementation works via process of entity resolution. It compares attributes of query provided against 
-its database of beneficiaries to find a match very likely referring to the same person. An example being if the first name,
-last name and phone number of a query matches a beneficiary in the searchservice's database it is very likely the same person. 
+The default implementation works via the process of entity resolution. It compares attributes of the query provided against its database of indexed beneficiaries to find a match very likely referencing the same person.
 
 Below is the set of matching rules employed:
 
@@ -189,8 +191,8 @@ Below is the set of matching rules employed:
 - first_name, bank_account_bank, bank_account_number
 - last_name, bank_account_bank, bank_account_number
 
-Note that to compensation of typos and ununiformity of text fields we use a selection of fuzzy matching and phonetics 
-algorithms when querying
+> **_NOTE:_**  
+> To compensate for typos and near infinite representation of the same information, we employ a selection of fuzzy matching and phonetics algorithms when indexing and querying
 
 ## Development
 
@@ -206,8 +208,7 @@ docker build --build-arg JAR_FILE=build/libs/*.jar -t openg2p/searchservice .
 ### Adding A New Search Backend
 
 Adopters can add and replace existing backends. Consider the example of adding a facial recognition backend that,
-added to the existing elasticsearch implementation, will compare the facial portrait of a person pending enrollment 
-against beneficiaries already enrolled into a program. Assuming beneficiaries' photos are stored in a attribute called `photo`, 
+added to the existing elasticsearch implementation, will compare the facial portrait of a person pending enrollment against beneficiaries already enrolled in a program. Assuming beneficiaries' photos are stored in an attribute called `photo`, 
 implementation will lock like:
 
 1) Provide a new implementation of `org.openg2p.searchservice.services.backends.Backend` and annotate with springs' `@Service` annotation
@@ -216,7 +217,7 @@ implementation will lock like:
 Your newly implemented backend will be passed data to index when the index API is called; a good practice is to check
 that the `photo` attribute exists before running your logic. That same method is called for both create and update document operations.
 
-To remove an existing backend simply remove springs `@Service` annotation for that backend's implementation. 
+To remove an existing backend, simply remove springs `@Service` annotation for that backend's implementation. 
 
 ### Reference Documentation
 For further reference, please consider the following sections:
