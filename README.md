@@ -148,6 +148,17 @@ Table shows a list of beneficiary attributes allowed for indexing and querying:
 You do not need to provide all this data when indexing or querying for records, however the more attributes you can 
 provide, the better the precision of your result; i.e. try to provide all for both index and query operations!
 
+### Kibana UI
+
+We docker compose ships with Kibana, providing the power to run visualize your beneficiary data in custom ways and 
+run queries against the elasticsearch beackend. 
+
+**Navigate to `http://<you-ip-address>:5601`**
+
+![](doc/images/kibana_query_ui.png)
+
+We appreciate if you can contribute these visualizations to the project.
+
 ## How it works
 The default implementation works via process of entity resolution. It compares attributes of query provided against 
 its database of beneficiaries to find a match very likely referring to the same person. An example being if the first name,
