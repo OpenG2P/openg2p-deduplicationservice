@@ -219,6 +219,11 @@ that the `photo` attribute exists before running your logic. That same method is
 
 To remove an existing backend, simply remove springs `@Service` annotation for that backend's implementation. 
 
+### Roadmap
+- [ ] Automated Testing 
+- [ ] Queue deduplication tasks 
+
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 
