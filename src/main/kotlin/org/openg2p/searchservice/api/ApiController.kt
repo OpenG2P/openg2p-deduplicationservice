@@ -15,7 +15,7 @@ import javax.validation.Valid
 class ApiController constructor(private val searchEngine: SearchEngine) {
 
     /**
-     * Endpoint to ensure bioanalyzer is up and running.
+     * Endpoint to ensure service is up and running.
      * @return
      */
     @GetMapping("/health")
