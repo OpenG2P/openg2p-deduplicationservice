@@ -6,7 +6,8 @@ and enrollment, 2) beneficiary list management, 3) payment digitization, and 4)
 recourse.
 
 This project provides an extensible entity resolution framework for finding/matching persons usually lacking
-unique identities, helping programs main the uniqueness of and deduplicate their beneficiary lists.
+unique identities, helping programs main the uniqueness of and deduplicate their beneficiary lists. Can also be used to enable linkages against external databases.
+
 
 Can be used as a standalone component and also integrates with the [OpenG2P CRM](https://github.com/openg2p/crm)
 
