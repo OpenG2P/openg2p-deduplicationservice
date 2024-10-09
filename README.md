@@ -1,3 +1,5 @@
+THIS SERVICE IS DEPRECATED
+
 # OpenG2P Search Service
 
 The “OpenG2P” is a set of digital building blocks opensourced to support large scale cash
